@@ -1,0 +1,22 @@
+
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "item": "minecraft:diorite"
+    },
+    {
+      "item": "minecraft:quartz"
+    },
+    {
+      "fluid": "minecraft:lava",
+      "nbt": {},
+      "amount": 8000
+    }
+  ],
+  "results": [
+    {
+      "item": "minecraft:calcite"
+    }
+  ]
+}

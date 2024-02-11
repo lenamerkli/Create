@@ -1,0 +1,22 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    {
+      "item": "minecraft:tuff"
+    },
+    {
+      "item": "minecraft:granite"
+    },
+    {
+      "fluid": "minecraft:lava",
+      "nbt": {},
+      "amount": 15000
+    }
+  ],
+  "results": [
+    {
+      "item": "create:ochrum",
+      "count": 2
+    }
+  ]
+}
