@@ -6,13 +6,13 @@ public class CSchematics extends ConfigBase {
 
 	public final ConfigBool creativePrintIncludesAir = b(false, "creativePrintIncludesAir", Comments.creativePrintIncludesAir);
 	public final ConfigInt maxSchematics = i(10, 1, "maxSchematics", Comments.maxSchematics);
-	public final ConfigInt maxTotalSchematicSize = i(256, 16, "maxSchematics", Comments.kb, Comments.maxSize);
+	public final ConfigInt maxTotalSchematicSize = i(2048, 16, "maxSchematics", Comments.kb, Comments.maxSize);
 	public final ConfigInt maxSchematicPacketSize =
 		i(1024, 256, 32767, "maxSchematicPacketSize", Comments.b, Comments.maxPacketSize);
 	public final ConfigInt schematicIdleTimeout = i(600, 100, "schematicIdleTimeout", Comments.idleTimeout);
 
 	public final ConfigGroup schematicannon = group(0, "schematicannon", "Schematicannon");
-	public final ConfigInt schematicannonDelay = i(10, 1, "schematicannonDelay", Comments.delay);
+	public final ConfigInt schematicannonDelay = i(1, 1, "schematicannonDelay", Comments.delay);
 	public final ConfigFloat schematicannonGunpowderWorth =
 		f(20, 0, 100, "schematicannonGunpowderWorth", Comments.gunpowderWorth);
 	public final ConfigFloat schematicannonFuelUsage = f(0.05f, 0, 100, "schematicannonFuelUsage", Comments.fuelUsage);
