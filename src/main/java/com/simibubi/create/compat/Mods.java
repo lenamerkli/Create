@@ -14,12 +14,15 @@ import net.minecraft.world.level.block.Block;
  * For compatibility with and without another mod present, we have to define load conditions of the specific code
  */
 public enum Mods {
-	DYNAMICTREES,
-	TCONSTRUCT,
-	CURIOS,
-
+	AETHER,
 	COMPUTERCRAFT,
+	CONNECTIVITY,
+	CURIOS,
+	DYNAMICTREES,
+	OCCULTISM,
+	PACKETFIXER,
 	STORAGEDRAWERS,
+	TCONSTRUCT,
 	XLPACKETS,
 
 	// fabric mods
@@ -30,10 +33,27 @@ public enum Mods {
 	SODIUM,
 	INDIUM;
 
+	private final String id;
 	private final boolean loaded;
 
 	Mods() {
-		loaded = FabricLoader.getInstance().isModLoaded(asId());
+		id = Lang.asId(name());
+		loaded = FabricLoader.getInstance().isModLoaded(id);
+	}
+
+	/**
+	 * @return the mod id
+	 */
+	public String id() {
+		return id;
+	}
+
+	public ResourceLocation rl(String path) {
+		return new ResourceLocation(id, path);
+	}
+
+	public Block getBlock(String id) {
+		return Registry.BLOCK.get(rl(id));
 	}
 
 	/**
@@ -42,13 +62,6 @@ public enum Mods {
 	public boolean isLoaded() {
 		return loaded;
     }
-
-	/**
-	 * @return the mod id
-	 */
-	public String asId() {
-		return Lang.asId(name());
-	}
 
 	/**
 	 * Simple hook to run code if a mod is installed
@@ -69,9 +82,5 @@ public enum Mods {
 		if (isLoaded()) {
 			toExecute.get().run();
 		}
-	}
-
-	public Block getBlock(String id) {
-		return Registry.BLOCK.get(new ResourceLocation(asId(), id));
 	}
 }

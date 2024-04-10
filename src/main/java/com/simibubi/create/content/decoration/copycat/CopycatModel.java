@@ -1,7 +1,18 @@
 package com.simibubi.create.content.decoration.copycat;
 
-import java.util.Random;
+import java.util.Objects;
 import java.util.function.Supplier;
+
+import com.jozufozu.flywheel.fabric.model.FabricModelUtil;
+
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
+import net.fabricmc.fabric.api.renderer.v1.material.MaterialFinder;
+import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext.QuadTransform;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.foundation.utility.Iterate;
@@ -11,6 +22,8 @@ import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
@@ -20,8 +33,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-
-import javax.annotation.Nullable;
 
 public abstract class CopycatModel extends ForwardingBakedModel implements CustomParticleIconModel {
 
@@ -70,7 +81,18 @@ public abstract class CopycatModel extends ForwardingBakedModel implements Custo
 			}
 		}
 
+		// fabric: If it is the default state do not push transformations, will cause issues with GhostBlockRenderer
+		boolean shouldTransform = material != AllBlocks.COPYCAT_BASE.getDefaultState();
+
+		// fabric: need to change the default render material
+		if (shouldTransform)
+			context.pushTransform(MaterialFixer.create(material));
+
 		emitBlockQuadsInner(blockView, state, pos, randomSupplier, context, material, cullFaceRemovalData, occlusionData);
+
+		// fabric: pop the material changer transform
+		if (shouldTransform)
+			context.popTransform();
 	}
 
 	protected abstract void emitBlockQuadsInner(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context, BlockState material, CullFaceRemovalData cullFaceRemovalData, OcclusionData occlusionData);
@@ -135,4 +157,23 @@ public abstract class CopycatModel extends ForwardingBakedModel implements Custo
 		}
 	}
 
+	private record MaterialFixer(RenderMaterial materialDefault) implements QuadTransform {
+		@Override
+		public boolean transform(MutableQuadView quad) {
+			BlendMode quadBlendMode = FabricModelUtil.getBlendMode(quad);
+			if (quadBlendMode == BlendMode.DEFAULT) {
+				// default needs to be changed from the Copycat's default (cutout) to the wrapped material's default.
+				quad.material(materialDefault);
+			}
+			return true;
+		}
+
+		public static MaterialFixer create(BlockState materialState) {
+			RenderType type = ItemBlockRenderTypes.getChunkRenderType(materialState);
+			BlendMode blendMode = BlendMode.fromRenderLayer(type);
+			MaterialFinder finder = Objects.requireNonNull(RendererAccess.INSTANCE.getRenderer()).materialFinder();
+			RenderMaterial renderMaterial = finder.blendMode(0, blendMode).find();
+			return new MaterialFixer(renderMaterial);
+		}
+	}
 }

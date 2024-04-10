@@ -2,6 +2,10 @@ package com.simibubi.create.foundation.events;
 
 import java.util.concurrent.Executor;
 
+import com.simibubi.create.api.event.PipeCollisionEvent;
+
+import com.simibubi.create.content.fluids.FluidReactions;
+
 import org.jetbrains.annotations.Nullable;
 
 import com.mojang.brigadier.CommandDispatcher;
@@ -28,6 +32,7 @@ import com.simibubi.create.content.equipment.wrench.WrenchEventHandler;
 import com.simibubi.create.content.equipment.wrench.WrenchItem;
 import com.simibubi.create.content.equipment.zapper.ZapperInteractionHandler;
 import com.simibubi.create.content.equipment.zapper.ZapperItem;
+import com.simibubi.create.content.kinetics.belt.BeltHelper;
 import com.simibubi.create.content.fluids.FluidBottleItemHook;
 import com.simibubi.create.content.kinetics.crank.ValveHandleBlock;
 import com.simibubi.create.content.kinetics.crusher.CrushingWheelBlockEntity;
@@ -156,6 +161,7 @@ public class CommonEvents {
 	public static void addReloadListeners() {
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(RecipeFinder.LISTENER);
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(PotatoProjectileTypeManager.ReloadListener.INSTANCE);
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(BeltHelper.LISTENER);
 	}
 
 	public static void onDatapackSync(ServerPlayer player, boolean joined) {
@@ -231,6 +237,8 @@ public class CommonEvents {
 		LivingEntityEvents.TICK.register(CommonEvents::onUpdateLivingEntity);
 		ServerPlayConnectionEvents.JOIN.register(CommonEvents::playerLoggedIn);
 		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(CommonEvents::onDatapackSync);
+		PipeCollisionEvent.FLOW.register(FluidReactions::handlePipeFlowCollisionFallback);
+		PipeCollisionEvent.SPILL.register(FluidReactions::handlePipeSpillCollisionFallback);
 		// fabric: some features using events on forge don't use events here.
 		// they've been left in this class for upstream compatibility.
 		CommonEvents.addReloadListeners();
@@ -249,13 +257,12 @@ public class CommonEvents {
 		UseBlockCallback.EVENT.register(SuperGlueItem::glueItemAlwaysPlacesWhenUsed);
 		UseBlockCallback.EVENT.register(ManualApplicationRecipe::manualApplicationRecipesApplyInWorld);
 		UseBlockCallback.EVENT.register(ValueSettingsInputHandler::onBlockActivated);
-		UseBlockCallback.EVENT.register(ClipboardValueSettingsHandler::leftClickToPaste);
 		UseBlockCallback.EVENT.register(ValveHandleBlock::onBlockActivated);
-		AttackBlockCallback.EVENT.register(ClipboardValueSettingsHandler::rightClickToCopy);
+		UseBlockCallback.EVENT.register(ClipboardValueSettingsHandler::rightClickToCopy);
+		AttackBlockCallback.EVENT.register(ClipboardValueSettingsHandler::leftClickToPaste);
 		AttackBlockCallback.EVENT.register(ZapperInteractionHandler::leftClickingBlocksWithTheZapperSelectsTheBlock);
 		UseEntityCallback.EVENT.register(ScheduleItemEntityInteraction::interactWithConductor);
 		ServerTickEvents.END_WORLD_TICK.register(HauntedBellPulser::hauntedBellCreatesPulse);
-		MobEntitySetTargetCallback.EVENT.register(DeployerFakePlayer::entitiesDontRetaliate);
 		MountEntityCallback.EVENT.register(CouplingHandler::preventEntitiesFromMoutingOccupiedCart);
 		LivingEntityEvents.EXPERIENCE_DROP_WITH_ENTITY.register(DeployerFakePlayer::deployerKillsDoNotSpawnXP);
 		LivingEntityEvents.ACTUALLY_HURT.register(ExtendoGripItem::bufferLivingAttackEvent);
@@ -267,9 +274,10 @@ public class CommonEvents {
 		LivingEntityEvents.LOOTING_LEVEL.register(CrushingWheelBlockEntity::crushingIsFortunate);
 		LivingEntityEvents.DROPS_WITH_LEVEL.register(DeployerFakePlayer::deployerCollectsDropsFromKilledEntities);
 		LivingEntityEvents.EQUIPMENT_CHANGE.register(NetheriteDivingHandler::onLivingEquipmentChange);
+		LivingEntityEvents.CHANGE_TARGET.register(DeployerFakePlayer::entitiesDontRetaliate);
 		EntityEvents.EYE_HEIGHT.register(DeployerFakePlayer::deployerHasEyesOnHisFeet);
-		BlockEvents.AFTER_PLACE.register(SymmetryHandler::onBlockPlaced);
-		BlockEvents.AFTER_PLACE.register(SuperGlueHandler::glueListensForBlockPlacement);
+		BlockEvents.POST_PROCESS_PLACE.register(SymmetryHandler::onBlockPlaced);
+		BlockEvents.POST_PROCESS_PLACE.register(SuperGlueHandler::glueListensForBlockPlacement);
 		ProjectileImpactCallback.EVENT.register(BlazeBurnerHandler::onThrowableImpact);
 		EntityReadExtraDataCallback.EVENT.register(ExtendoGripItem::addReachToJoiningPlayersHoldingExtendo);
 		MinecartEvents.SPAWN.register(AbstractMinecartExtensions::minecartSpawn);

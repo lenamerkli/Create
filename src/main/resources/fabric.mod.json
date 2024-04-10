@@ -27,7 +27,7 @@
       "com.simibubi.create.CreateClient"
     ],
     "fabric-datagen": [
-      "com.simibubi.create.CreateData"
+      "com.simibubi.create.infrastructure.data.CreateDatagen"
     ],
     "fabric-gametest": [
       "com.simibubi.create.infrastructure.gametest.CreateGameTests"
@@ -74,7 +74,15 @@
   "breaks": {
     "optifabric": "*",
     "colormatic": "<=3.1.1",
-    "iris": "<=1.2.5"
+    "iris": "<=1.2.5",
+
+    "sound_physics_remastered": "*",
+
+    "railways": "<1.5.3",
+    "create_interactive": "<=1.0.1-beta.2",
+    "create_jetpack": "<=3.4.1",
+    "garnished": "<=1.6.3",
+    "extendedbogeys": "<=0.4.5"
   },
 
   "custom": {

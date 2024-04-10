@@ -20,6 +20,7 @@ import com.simibubi.create.content.logistics.funnel.FunnelBlock;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.item.ItemHelper.ExtractionCountMode;
 import com.simibubi.create.foundation.particle.AirParticleData;
@@ -33,6 +34,8 @@ import com.simibubi.create.infrastructure.config.AllConfigs;
 
 import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
+import io.github.fabricators_of_create.porting_lib.transfer.item.ItemTransferable;
 import io.github.fabricators_of_create.porting_lib.util.ItemStackUtil;
 import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 import io.github.fabricators_of_create.porting_lib.util.StorageProvider;
@@ -85,6 +88,8 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 	int airCurrentUpdateCooldown;
 	int entitySearchCooldown;
 
+	VersionedInventoryTrackerBehaviour invVersionTracker;
+
 	StorageProvider<ItemVariant> capAbove;
 	StorageProvider<ItemVariant> capBelow;
 
@@ -110,6 +115,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(new DirectBeltInputBehaviour(this).onlyInsertWhen((d) -> canDirectlyInsertCached()));
+		behaviours.add(invVersionTracker = new VersionedInventoryTrackerBehaviour(this));
 		registerAwardables(behaviours, AllAdvancements.CHUTE);
 	}
 
@@ -339,8 +345,10 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 		handleInput(storage, 0);
 	}
 
-	private void handleInput(Storage<ItemVariant> inv, float startLocation) {
+	private void handleInput(@Nullable Storage<ItemVariant> inv, float startLocation) {
 		if (inv == null)
+			return;
+		if (invVersionTracker.stillWaiting(inv))
 			return;
 		Predicate<ItemStack> canAccept = this::canAcceptItem;
 		int count = getExtractionAmount();
@@ -348,9 +356,12 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 		if (mode == ExtractionCountMode.UPTO || !ItemHelper.extract(inv, canAccept, mode, count, true)
 			.isEmpty()) {
 			ItemStack extracted = ItemHelper.extract(inv, canAccept, mode, count, false);
-			if (!extracted.isEmpty())
+			if (!extracted.isEmpty()) {
 				setItem(extracted, startLocation);
+				return;
+			}
 		}
+		invVersionTracker.awaitNewVersion(inv);
 	}
 
 	private boolean handleDownwardOutput(boolean simulate) {
@@ -360,12 +371,16 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 
 		if (level == null || direction == null || !this.canOutputItems())
 			return false;
-		Storage<ItemVariant> below = grabCapability(Direction.DOWN);
-		if (below != null) {
+		Storage<ItemVariant> inv = grabCapability(Direction.DOWN);
+		if (inv != null) {
 			if (level.isClientSide && !isVirtual())
 				return false;
+
+			if (invVersionTracker.stillWaiting(inv))
+				return false;
+
 			try (Transaction t = TransferUtil.getTransaction()) {
-				long inserted = below.insert(ItemVariant.of(item), item.getCount(), t);
+				long inserted = inv.insert(ItemVariant.of(item), item.getCount(), t);
 				if (inserted != 0 && !simulate) t.commit();
 				ItemStack held = getItem();
 				if (!simulate) {
@@ -375,9 +390,13 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 				}
 				if (inserted != 0)
 					return true;
-				if (direction == Direction.DOWN)
-					return false;
 			}
+
+			// awaitNewVersion and getVersion cannot be called during a transaction and will throw an IllegalStateException,
+			// so we call this outside of the transaction
+			invVersionTracker.awaitNewVersion(inv);
+			if (direction == Direction.DOWN)
+				return false;
 		}
 
 		if (targetChute != null) {
@@ -419,12 +438,16 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 			return false;
 
 		if (AbstractChuteBlock.isOpenChute(getBlockState())) {
-			Storage<ItemVariant> above = grabCapability(Direction.UP);
-			if (above != null) {
+			Storage<ItemVariant> inv = grabCapability(Direction.UP);
+			if (inv != null) {
 				if (level.isClientSide && !isVirtual() && !ChuteBlock.isChute(stateAbove))
 					return false;
+
+				if (invVersionTracker.stillWaiting(inv))
+					return false;
+
 				try (Transaction t = TransferUtil.getTransaction()) {
-					long inserted = above.insert(ItemVariant.of(item), item.getCount(), t);
+					long inserted = inv.insert(ItemVariant.of(item), item.getCount(), t);
 					if (!simulate) {
 						item = item.copy();
 						item.shrink(ItemHelper.truncateLong(inserted));
@@ -432,8 +455,14 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 						sendData();
 						t.commit();
 					}
-					return inserted != 0;
+					if (inserted != 0)
+						return true;
 				}
+
+				// awaitNewVersion and getVersion cannot be called during a transaction and will throw an IllegalStateException,
+				// so we call this outside of the transaction
+				invVersionTracker.awaitNewVersion(inv);
+				return false;
 			}
 		}
 
@@ -497,6 +526,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 		return true;
 	}
 
+	@Nullable
 	private Storage<ItemVariant> grabCapability(Direction side) {
 		if (level == null)
 			return null;
@@ -517,6 +547,7 @@ public class ChuteBlockEntity extends SmartBlockEntity implements IHaveGoggleInf
 		item = stack;
 		itemPosition.startWithValue(insertionPos);
 		itemHandler.update();
+		invVersionTracker.reset();
 		if (!level.isClientSide) {
 			notifyUpdate();
 			award(AllAdvancements.CHUTE);
