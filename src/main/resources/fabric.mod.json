@@ -6,9 +6,9 @@
   "name": "Create",
   "description": "Technology that empowers the player.",
   "authors": [
+    "Lena Merkli",
     "Fabricators of Create",
-    "Creators of Create",
-    "Merkli"
+    "Creators of Create"
   ],
   "contact": {
     "issues": "https://github.com/Fabricators-of-Create/Create/issues",
@@ -66,7 +66,9 @@
 
     "forgeconfigapiport": ">=${forge_config_version}",
     "milk": ">=${milk_lib_version}",
-    "reach-entity-attributes": ">=${reach_entity_attributes_version}"
+    "reach-entity-attributes": ">=${reach_entity_attributes_version}",
+
+    "nbtcrafting": ">=2.2.3"
   },
 
   "breaks": {
