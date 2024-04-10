@@ -1,0 +1,31 @@
+
+{
+  "type": "create:mechanical_crafting",
+  "acceptMirrored": false,
+  "key": {
+    "A": {
+      "item": "minecraft:red_stained_glass"
+    },
+    "P": {
+      "item": "minecraft:obsidian"
+    },
+    "S": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "pattern": [
+    " AAA ",
+    "AAPAA",
+    "APSPA",
+    "AAPAA",
+    " AAA "
+  ],
+  "result": {
+    "count": 8,
+    "item": "mini_scaled:scale_box_item",
+    "data": {
+      "size": 4,
+      "color": "red"
+    }
+  }
+}

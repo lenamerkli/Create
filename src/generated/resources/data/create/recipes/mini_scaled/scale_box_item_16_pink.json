@@ -1,0 +1,31 @@
+
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AAA",
+    "ABA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:gold_ingot"
+    },
+    "B": {
+      "item": "mini_scaled:scale_box_item",
+      "data": {
+        "require": {
+          "size": 8,
+          "color": "pink"
+        }
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "mini_scaled:scale_box_item",
+    "data": {
+      "size": 16,
+      "color": "pink"
+    }
+  }
+}

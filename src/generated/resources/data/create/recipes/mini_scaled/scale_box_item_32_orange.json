@@ -1,0 +1,31 @@
+
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AAA",
+    "ABA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:diamond"
+    },
+    "B": {
+      "item": "mini_scaled:scale_box_item",
+      "data": {
+        "require": {
+          "size": 16,
+          "color": "orange"
+        }
+      }
+    }
+  },
+  "result": {
+    "count": 1,
+    "item": "mini_scaled:scale_box_item",
+    "data": {
+      "size": 32,
+      "color": "orange"
+    }
+  }
+}
