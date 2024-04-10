@@ -1,0 +1,21 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "item": "minecraft:cobblestone"
+    },
+    {
+      "item": "minecraft:quartz"
+    },
+    {
+      "fluid": "minecraft:lava",
+      "nbt": {},
+      "amount": 8000
+    }
+  ],
+  "results": [
+    {
+      "item": "create:limestone"
+    }
+  ]
+}

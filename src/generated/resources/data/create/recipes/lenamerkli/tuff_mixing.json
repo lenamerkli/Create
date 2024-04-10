@@ -1,0 +1,22 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "item": "minecraft:cobblestone"
+    },
+    {
+      "item": "minecraft:gravel"
+    },
+    {
+      "fluid": "minecraft:lava",
+      "nbt": {},
+      "amount": 12000
+    }
+  ],
+  "results": [
+    {
+      "item": "minecraft:tuff",
+      "count": 2
+    }
+  ]
+}
