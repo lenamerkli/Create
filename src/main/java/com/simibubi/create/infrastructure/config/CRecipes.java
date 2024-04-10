@@ -12,7 +12,7 @@ public class CRecipes extends ConfigBase {
 	public final ConfigBool allowRegularCraftingInCrafter =
 		b(true, "allowRegularCraftingInCrafter", Comments.allowRegularCraftingInCrafter);
 	public final ConfigInt maxFireworkIngredientsInCrafter =
-		i(9, 1, "maxFireworkIngredientsInCrafter", Comments.maxFireworkIngredientsInCrafter);
+		i(3, 1, 3, "maxFireworkIngredientsInCrafter", Comments.maxFireworkIngredientsInCrafter);
 	public final ConfigBool allowStonecuttingOnSaw = b(true, "allowStonecuttingOnSaw", Comments.allowStonecuttingOnSaw);
 	public final ConfigBool allowWoodcuttingOnSaw = b(true, "allowWoodcuttingOnSaw", Comments.allowWoodcuttingOnSaw);
 	public final ConfigBool allowCastingBySpout = b(true, "allowCastingBySpout", Comments.allowCastingBySpout);

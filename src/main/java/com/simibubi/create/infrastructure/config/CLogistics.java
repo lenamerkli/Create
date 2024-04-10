@@ -4,13 +4,13 @@ import com.simibubi.create.foundation.config.ConfigBase;
 
 public class CLogistics extends ConfigBase {
 
-	public final ConfigInt defaultExtractionTimer = i(8, 1, "defaultExtractionTimer", Comments.defaultExtractionTimer);
+	public final ConfigInt defaultExtractionTimer = i(2, 1, "defaultExtractionTimer", Comments.defaultExtractionTimer);
 	public final ConfigInt psiTimeout = i(60, 1, "psiTimeout", Comments.psiTimeout);
 	public final ConfigInt mechanicalArmRange = i(5, 1, "mechanicalArmRange", Comments.mechanicalArmRange);
 	public final ConfigInt linkRange = i(256, 1, "linkRange", Comments.linkRange);
-	public final ConfigInt displayLinkRange = i(64, 1, "displayLinkRange", Comments.displayLinkRange);
+	public final ConfigInt displayLinkRange = i(256, 1, "displayLinkRange", Comments.displayLinkRange);
 	public final ConfigInt vaultCapacity = i(20, 1, "vaultCapacity", Comments.vaultCapacity);
-	public final ConfigInt brassTunnelTimer = i(10, 1, 10, "brassTunnelTimer", Comments.brassTunnelTimer);
+	public final ConfigInt brassTunnelTimer = i(2, 1, 10, "brassTunnelTimer", Comments.brassTunnelTimer);
 	public final ConfigBool seatHostileMobs = b(true, "seatHostileMobs", Comments.seatHostileMobs);
 
 	@Override

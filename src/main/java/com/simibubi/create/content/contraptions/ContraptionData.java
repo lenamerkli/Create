@@ -14,7 +14,7 @@ public class ContraptionData {
 	/**
 	 * A sane, default maximum for contraption data size.
 	 */
-	public static final int DEFAULT_MAX = 2_000_000;
+	public static final int DEFAULT_MAX = 20_000_000;
 	/**
 	 * XL Packets expands the NBT packet limit to 2 GB.
 	 */

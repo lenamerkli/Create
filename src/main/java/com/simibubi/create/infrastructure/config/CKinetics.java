@@ -28,7 +28,7 @@ public class CKinetics extends ConfigBase {
 	public final ConfigInt fanProcessingTime = i(150, 0, "fanProcessingTime", Comments.fanProcessingTime);
 
 	public final ConfigGroup contraptions = group(1, "contraptions", "Moving Contraptions");
-	public final ConfigInt maxBlocksMoved = i(2048, 1, "maxBlocksMoved", Comments.maxBlocksMoved);
+	public final ConfigInt maxBlocksMoved = i(8192, 1, "maxBlocksMoved", Comments.maxBlocksMoved);
 	public final ConfigInt maxDataSize =
 		i(ContraptionData.DEFAULT_MAX, 0, "maxDataSize", Comments.bytes, Comments.maxDataDisable, Comments.maxDataSize, Comments.maxDataSize2);
 	public final ConfigInt maxChassisRange = i(16, 1, "maxChassisRange", Comments.maxChassisRange);

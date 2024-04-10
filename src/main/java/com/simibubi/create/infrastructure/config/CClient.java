@@ -91,8 +91,8 @@ public class CClient extends ConfigBase {
 
 	//train group
 	public final ConfigGroup trains = group(1, "trains", Comments.trains);
-	public final ConfigFloat mountedZoomMultiplier = f(3, 0, "mountedZoomMultiplier", Comments.mountedZoomMultiplier);
-	public final ConfigBool showTrackGraphOnF3 = b(false, "showTrackGraphOnF3", Comments.showTrackGraphOnF3);
+	public final ConfigFloat mountedZoomMultiplier = f(2, 0, "mountedZoomMultiplier", Comments.mountedZoomMultiplier);
+	public final ConfigBool showTrackGraphOnF3 = b(true, "showTrackGraphOnF3", Comments.showTrackGraphOnF3);
 	public final ConfigBool showExtendedTrackGraphOnF3 = b(false, "showExtendedTrackGraphOnF3", Comments.showExtendedTrackGraphOnF3);
 
 	@Override

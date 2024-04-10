@@ -11,9 +11,9 @@ public class CFluids extends ConfigBase {
 		i(16, 1, "mechanicalPumpRange", Comments.blocks, Comments.mechanicalPumpRange);
 
 	public final ConfigInt hosePulleyRange = i(128, 1, "hosePulleyRange", Comments.blocks, Comments.hosePulleyRange);
-	public final ConfigInt hosePulleyBlockThreshold = i(10000, -1, "hosePulleyBlockThreshold", Comments.blocks,
+	public final ConfigInt hosePulleyBlockThreshold = i(8192, -1, "hosePulleyBlockThreshold", Comments.blocks,
 		Comments.toDisable, Comments.hosePulleyBlockThreshold);
-	public final ConfigBool fillInfinite = b(false, "fillInfinite", Comments.fillInfinite);
+	public final ConfigBool fillInfinite = b(true, "fillInfinite", Comments.fillInfinite);
 	public final ConfigEnum<BottomlessFluidMode> bottomlessFluidMode = e(BottomlessFluidMode.ALLOW_BY_TAG, "bottomlessFluidMode",
 		Comments.bottomlessFluidMode);
 
