@@ -5,10 +5,10 @@ import com.simibubi.create.foundation.config.ConfigBase;
 public class CSchematics extends ConfigBase {
 
 	public final ConfigBool creativePrintIncludesAir = b(false, "creativePrintIncludesAir", Comments.creativePrintIncludesAir);
-	public final ConfigInt maxSchematics = i(10, 1, "maxSchematics", Comments.maxSchematics);
+	public final ConfigInt maxSchematics = i(24, 1, "maxSchematics", Comments.maxSchematics);
 	public final ConfigInt maxTotalSchematicSize = i(2048, 16, "maxSchematics", Comments.kb, Comments.maxSize);
 	public final ConfigInt maxSchematicPacketSize =
-		i(1024, 256, 32767, "maxSchematicPacketSize", Comments.b, Comments.maxPacketSize);
+		i(8192, 256, 32767, "maxSchematicPacketSize", Comments.b, Comments.maxPacketSize);
 	public final ConfigInt schematicIdleTimeout = i(600, 100, "schematicIdleTimeout", Comments.idleTimeout);
 
 	public final ConfigGroup schematicannon = group(0, "schematicannon", "Schematicannon");

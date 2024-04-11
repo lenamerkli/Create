@@ -13,10 +13,10 @@ public class CTrains extends ConfigBase {
 	public final ConfigGroup trainStats = group(1, "trainStats", "Standard Trains");
 	public final ConfigFloat trainTopSpeed = f(22, 0, "trainTopSpeed", Comments.mps, Comments.trainTopSpeed);
 	public final ConfigFloat trainTurningTopSpeed = f(12, 0, "trainTurningTopSpeed", Comments.mps, Comments.trainTurningTopSpeed);
-	public final ConfigFloat trainAcceleration = f(3, 0, "trainAcceleration", Comments.acc, Comments.trainAcceleration);
+	public final ConfigFloat trainAcceleration = f(2, 0, "trainAcceleration", Comments.acc, Comments.trainAcceleration);
 
 	public final ConfigGroup poweredTrainStats = group(1, "poweredTrainStats", "Powered Trains");
-	public final ConfigFloat poweredTrainTopSpeed = f(32, 0, "poweredTrainTopSpeed", Comments.mps, Comments.poweredTrainTopSpeed);
+	public final ConfigFloat poweredTrainTopSpeed = f(28, 0, "poweredTrainTopSpeed", Comments.mps, Comments.poweredTrainTopSpeed);
 	public final ConfigFloat poweredTrainTurningTopSpeed = f(18, 0, "poweredTrainTurningTopSpeed", Comments.mps, Comments.poweredTrainTurningTopSpeed);
 	public final ConfigFloat poweredTrainAcceleration = f(3, 0, "poweredTrainAcceleration", Comments.acc, Comments.poweredTrainAcceleration);
 
