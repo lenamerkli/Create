@@ -18,7 +18,8 @@ import com.simibubi.create.content.schematics.requirement.ItemRequirement.ItemUs
 import com.simibubi.create.foundation.utility.Iterate;
 import com.simibubi.create.foundation.utility.VecHelper;
 
-import io.github.fabricators_of_create.porting_lib.entity.ExtraSpawnDataEntity;
+import io.github.fabricators_of_create.porting_lib.entity.IEntityAdditionalSpawnData;
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,7 +57,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class SuperGlueEntity extends Entity
-		implements ExtraSpawnDataEntity, ISpecialEntityItemRequirement {
+		implements IEntityAdditionalSpawnData, ISpecialEntityItemRequirement {
 
 	public static AABB span(BlockPos startPos, BlockPos endPos) {
 		return new AABB(startPos, endPos).expandTowards(1, 1, 1);
@@ -265,6 +266,11 @@ public class SuperGlueEntity extends Entity
 	}
 
 	@Override
+	public Packet<ClientGamePacketListener> getAddEntityPacket() {
+		return PortingLibEntity.getEntitySpawningPacket(this);
+	}
+
+	@Override
 	public void writeSpawnData(FriendlyByteBuf buffer) {
 		CompoundTag compound = new CompoundTag();
 		addAdditionalSaveData(compound);
@@ -295,9 +301,12 @@ public class SuperGlueEntity extends Entity
 		return PushReaction.IGNORE;
 	}
 
+	public void setPortalEntrancePos() {
+		portalEntrancePos = blockPosition();
+	}
+
 	@Override
 	public PortalInfo findDimensionEntryPoint(ServerLevel pDestination) {
-		portalEntrancePos = blockPosition();
 		return super.findDimensionEntryPoint(pDestination);
 	}
 

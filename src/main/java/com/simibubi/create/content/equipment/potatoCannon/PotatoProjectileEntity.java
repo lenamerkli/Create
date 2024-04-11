@@ -1,12 +1,17 @@
 package com.simibubi.create.content.equipment.potatoCannon;
 
-import com.simibubi.create.AllDamageTypes;
+import io.github.fabricators_of_create.porting_lib.entity.IEntityAdditionalSpawnData;
+
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
+
+import org.jetbrains.annotations.NotNull;
+
 import com.simibubi.create.AllEnchantments;
 import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.foundation.advancement.AllAdvancements;
+import com.simibubi.create.foundation.damageTypes.CreateDamageSources;
 import com.simibubi.create.foundation.particle.AirParticleData;
 import com.simibubi.create.foundation.utility.VecHelper;
-import io.github.fabricators_of_create.porting_lib.entity.ExtraSpawnDataEntity;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemHandlerHelper;
 import io.github.fabricators_of_create.porting_lib.util.NBTSerializer;
 
@@ -40,9 +45,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
-import org.jetbrains.annotations.NotNull;
-
-public class PotatoProjectileEntity extends AbstractHurtingProjectile implements ExtraSpawnDataEntity {
+public class PotatoProjectileEntity extends AbstractHurtingProjectile implements IEntityAdditionalSpawnData {
 
 	protected PotatoCannonProjectileType type;
 	protected ItemStack stack = ItemStack.EMPTY;
@@ -320,13 +323,18 @@ public class PotatoProjectileEntity extends AbstractHurtingProjectile implements
 	}
 
 	private DamageSource causePotatoDamage() {
-		return AllDamageTypes.POTATO_CANNON.source(level(), getOwner(), this);
+		return CreateDamageSources.potatoCannon(level(), getOwner(), this);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static FabricEntityTypeBuilder<?> build(FabricEntityTypeBuilder<?> builder) {
 //		EntityType.Builder<PotatoProjectileEntity> entityBuilder = (EntityType.Builder<PotatoProjectileEntity>) builder;
 		return builder.dimensions(EntityDimensions.fixed(0.25f, 0.25f));
+	}
+
+	@Override
+	public Packet<ClientGamePacketListener> getAddEntityPacket() {
+		return PortingLibEntity.getEntitySpawningPacket(this);
 	}
 
 	@Override

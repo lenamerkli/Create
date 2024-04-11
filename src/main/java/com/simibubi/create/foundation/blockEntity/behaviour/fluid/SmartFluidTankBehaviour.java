@@ -18,7 +18,7 @@ import com.simibubi.create.foundation.fluid.SmartFluidTank;
 import com.simibubi.create.foundation.utility.NBTHelper;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat;
 import com.simibubi.create.foundation.utility.animation.LerpedFloat.Chaser;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 
 import net.minecraft.nbt.CompoundTag;
@@ -282,6 +282,10 @@ public class SmartFluidTankBehaviour extends BlockEntityBehaviour {
 			return false;
 		}
 
+		// fabric: expose for basin tooltips
+		public SmartFluidTank getTank() {
+			return tank;
+		}
 	}
 
 	@Override

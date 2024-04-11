@@ -11,10 +11,11 @@ import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringB
 import com.simibubi.create.foundation.blockEntity.behaviour.inventory.CapManipulationBehaviourBase.InterfaceProvider;
 import com.simibubi.create.foundation.blockEntity.behaviour.inventory.InvManipulationBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.inventory.TankManipulationBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryTrackerBehaviour;
 import com.simibubi.create.foundation.utility.BlockFace;
 
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -41,6 +43,7 @@ public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
 	private FilteringBehaviour filtering;
 	private InvManipulationBehaviour observedInventory;
 	private TankManipulationBehaviour observedTank;
+	private VersionedInventoryTrackerBehaviour invVersionTracker;
 
 	public ThresholdSwitchBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -108,19 +111,27 @@ public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
 
 //		} else if (StorageDrawers.isDrawer(targetBlockEntity) && observedInventory.hasInventory()) {
 //			currentLevel = StorageDrawers.getTrueFillLevel(observedInventory.getInventory(), filtering);
+
 		} else if (observedInventory.hasInventory() || observedTank.hasInventory()) {
 			if (observedInventory.hasInventory()) {
+
 				// Item inventory
-				try (Transaction t = TransferUtil.getTransaction()) {
-					Storage<ItemVariant> inv = observedInventory.getInventory();
+				Storage<ItemVariant> inv = observedInventory.getInventory();
+				if (invVersionTracker.stillWaiting(inv)) {
+					occupied = prevLevel;
+					totalSpace = 1f;
+
+				} else {
+					invVersionTracker.awaitNewVersion(inv);
 					for (StorageView<ItemVariant> view : inv) {
-						long space = view.getCapacity();
+						ItemStack stackInSlot = view.getResource().toStack();
+						long space = Math.min(stackInSlot.getMaxStackSize(), view.getCapacity());
 						long count = view.getAmount();
 						if (space == 0)
 							continue;
 
 						totalSpace += 1;
-						if (filtering.test(view.getResource().toStack()))
+						if (filtering.test(stackInSlot))
 							occupied += count * (1f / space);
 					}
 				}
@@ -128,18 +139,16 @@ public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
 
 			if (observedTank.hasInventory()) {
 				// Fluid inventory
-				try (Transaction t = TransferUtil.getTransaction()) {
-					Storage<FluidVariant> tank = observedTank.getInventory();
-					for (StorageView<FluidVariant> view : tank) {
-						long space = view.getCapacity();
-						long count = view.getAmount();
-						if (space == 0)
-							continue;
+				Storage<FluidVariant> tank = observedTank.getInventory();
+				for (StorageView<FluidVariant> view : tank) {
+					long space = view.getCapacity();
+					long count = view.getAmount();
+					if (space == 0)
+						continue;
 
-						totalSpace += 1;
-						if (filtering.test(new FluidStack(view)))
-							occupied += count * (1f / space);
-					}
+					totalSpace += 1;
+					if (filtering.test(new FluidStack(view)))
+						occupied += count * (1f / space);
 				}
 			}
 
@@ -207,7 +216,12 @@ public class ThresholdSwitchBlockEntity extends SmartBlockEntity {
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 		behaviours.add(filtering = new FilteringBehaviour(this, new FilteredDetectorFilterSlot(true))
-			.withCallback($ -> this.updateCurrentLevel()));
+			.withCallback($ -> {
+				this.updateCurrentLevel();
+				invVersionTracker.reset();
+			}));
+
+		behaviours.add(invVersionTracker = new VersionedInventoryTrackerBehaviour(this));
 
 		InterfaceProvider towardBlockFacing =
 			(w, p, s) -> new BlockFace(p, DirectedDirectionalBlock.getTargetDirection(s));

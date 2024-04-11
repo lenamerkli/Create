@@ -8,6 +8,7 @@ import com.simibubi.create.AllShapes;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -115,6 +116,11 @@ public class BacktankBlock extends HorizontalKineticBlock
 				be.setEnchantmentTag(stack.getEnchantmentTags());
 			if (stack.hasCustomHoverName())
 				be.setCustomName(stack.getHoverName());
+			// fabric: forge mangles item placement logic, so this isn't needed there.
+			// here, we need to do this manually so neighboring blocks are updated (comparators, #1396)
+			// this isn't needed for other items with block entity data (ex. chests) since they use the BlockEntityTag
+			// nbt, and that system calls this after updating it.
+			be.setChanged();
 		});
 	}
 
@@ -123,7 +129,7 @@ public class BacktankBlock extends HorizontalKineticBlock
 		BlockHitResult hit) {
 		if (player == null)
 			return InteractionResult.PASS;
-		if (player.isFake())
+		if (player instanceof FakePlayer)
 			return InteractionResult.PASS;
 		if (player.isShiftKeyDown())
 			return InteractionResult.PASS;

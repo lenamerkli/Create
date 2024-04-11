@@ -27,7 +27,7 @@
       "com.simibubi.create.CreateClient"
     ],
     "fabric-datagen": [
-      "com.simibubi.create.CreateData"
+      "com.simibubi.create.infrastructure.data.CreateDatagen"
     ],
     "fabric-gametest": [
       "com.simibubi.create.infrastructure.gametest.CreateGameTests"
@@ -58,7 +58,6 @@
     "porting_lib_base": ">=${port_lib_base_version}",
     "porting_lib_entity": ">=${port_lib_entity_version}",
     "porting_lib_extensions": ">=${port_lib_extensions_version}",
-    "porting_lib_fake_players": ">=${port_lib_fake_players_version}",
     "porting_lib_networking": ">=${port_lib_networking_version}",
     "porting_lib_obj_loader": ">=${port_lib_obj_loader_version}",
     "porting_lib_tags": ">=${port_lib_tags_version}",
@@ -75,7 +74,27 @@
     "optifabric": "*",
     "colormatic": "<=3.1.1",
     "iris": "<=1.2.5",
-    "sodium": ">=0.5.0"
+    "sodium": "<=0.4.10",
+
+    "sound_physics_remastered": "*",
+
+    "railways": "<1.5.3",
+    "create_enchantment_industry": "<1.2.16",
+    "create_interactive": "<=1.0.2-beta.1",
+    "createfabricfixes": "<=0.0.1",
+    "garnished": "<=1.6.3",
+    "extendedgears": "<=2.1.0",
+    "missions": "<=0.3",
+    "create_so": "<=1.6",
+    "createdieselgenerators": "<=2.1.3",
+    "create_power_loader": "<=1.4.2",
+    "createbigcannons": "<=0.5.3",
+    "copycats": "<=1.1.1",
+    "sliceanddice": "<=3.0.0",
+    "create_jetpack": "<=4.1.1",
+    "createorigins": "<=1.2.1",
+    "exposure": "<=1.4.0",
+    "cobblegen": "<=5.3.2"
   },
 
   "custom": {

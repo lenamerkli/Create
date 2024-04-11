@@ -13,6 +13,7 @@ import com.simibubi.create.AllPackets;
 import com.simibubi.create.AllParticleTypes;
 import com.simibubi.create.Create;
 import com.simibubi.create.CreateClient;
+import com.simibubi.create.compat.Mods;
 import com.simibubi.create.content.contraptions.ContraptionHandler;
 import com.simibubi.create.content.contraptions.ContraptionHandlerClient;
 import com.simibubi.create.content.contraptions.actors.trainControls.ControlsHandler;
@@ -26,6 +27,7 @@ import com.simibubi.create.content.decoration.girder.GirderWrenchBehavior;
 import com.simibubi.create.content.equipment.armor.BacktankArmorLayer;
 import com.simibubi.create.content.equipment.armor.DivingHelmetItem;
 import com.simibubi.create.content.equipment.armor.NetheriteBacktankFirstPersonRenderer;
+import com.simibubi.create.content.equipment.armor.NetheriteDivingHandler;
 import com.simibubi.create.content.equipment.blueprint.BlueprintOverlayRenderer;
 import com.simibubi.create.content.equipment.clipboard.ClipboardValueSettingsHandler;
 import com.simibubi.create.content.equipment.extendoGrip.ExtendoGripRenderHandler;
@@ -74,7 +76,7 @@ import com.simibubi.create.infrastructure.gui.OpenCreateMenuButton;
 
 import io.github.fabricators_of_create.porting_lib.client_events.event.client.RenderArmCallback;
 import io.github.fabricators_of_create.porting_lib.entity.events.EntityMountEvents;
-import io.github.fabricators_of_create.porting_lib.entity.events.player.PlayerTickEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.PlayerTickEvents;
 import io.github.fabricators_of_create.porting_lib.event.client.CameraSetupCallback;
 import io.github.fabricators_of_create.porting_lib.event.client.CameraSetupCallback.CameraInfo;
 import io.github.fabricators_of_create.porting_lib.event.client.ClientWorldEvents;
@@ -333,7 +335,7 @@ public class ClientEvents {
 			if (FluidHelper.isWater(fluid)) {
 				fogData.scaleFarPlaneDistance(6.25f);
 				return true;
-			} else if (FluidHelper.isLava(fluid) && AllItems.NETHERITE_DIVING_HELMET.isIn(divingHelmet)) {
+			} else if (FluidHelper.isLava(fluid) && NetheriteDivingHandler.isNetheriteDivingHelmet(divingHelmet)) {
 				fogData.setNearPlaneDistance(-4.0f);
 				fogData.setFarPlaneDistance(20.0f);
 				return true;

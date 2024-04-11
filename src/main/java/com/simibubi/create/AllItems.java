@@ -77,7 +77,9 @@ import net.minecraft.world.item.Rarity;
 
 public class AllItems {
 
-	static { REGISTRATE.useCreativeTab(AllCreativeModeTabs.MAIN_TAB.key()); }
+	static {
+		REGISTRATE.setCreativeTab(AllCreativeModeTabs.BASE_CREATIVE_TAB.key());
+	}
 
 	public static final ItemEntry<Item> WHEAT_FLOUR =
 		taggedIngredient("wheat_flour", forgeItemTag("wheat_flour"), forgeItemTag("flour")),
@@ -262,6 +264,7 @@ public class AllItems {
 				p -> new BacktankItem(AllArmorMaterials.COPPER, p, Create.asResource("copper_diving"),
 					COPPER_BACKTANK_PLACEABLE))
 			.model(AssetLookup.customGenericItemModel("_", "item"))
+				.properties(p -> p.durability(-1)) // fabric: Item#canBeDepleted() isn't enough to disable durability, so we need to set its maxDamage to -1 as well
 			.tag(AllItemTags.PRESSURIZED_AIR_SOURCES.tag)
 			.tag(forgeItemTag("chestplates"))
 			.register(),
@@ -271,7 +274,7 @@ public class AllItems {
 				p -> new BacktankItem.Layered(ArmorMaterials.NETHERITE, p, Create.asResource("netherite_diving"),
 					NETHERITE_BACKTANK_PLACEABLE))
 			.model(AssetLookup.customGenericItemModel("_", "item"))
-			.properties(p -> p.fireResistant())
+			.properties(p -> p.fireResistant().durability(-1)) // fabric: Item#canBeDepleted() isn't enough to disable durability, so we need to set its maxDamage to -1 as well
 			.tag(AllItemTags.PRESSURIZED_AIR_SOURCES.tag)
 			.tag(forgeItemTag("chestplates"))
 			.register();

@@ -37,8 +37,10 @@ import com.simibubi.create.compat.emi.recipes.fan.FanEmiRecipe;
 import com.simibubi.create.compat.emi.recipes.fan.FanHauntingEmiRecipe;
 import com.simibubi.create.compat.emi.recipes.fan.FanSmokingEmiRecipe;
 import com.simibubi.create.compat.emi.recipes.fan.FanWashingEmiRecipe;
+import com.simibubi.create.compat.recipeViewerCommon.HiddenItems;
 import com.simibubi.create.compat.rei.ConversionRecipe;
 import com.simibubi.create.compat.rei.ToolboxColoringRecipeMaker;
+import com.simibubi.create.content.decoration.palettes.AllPaletteStoneTypes;
 import com.simibubi.create.content.equipment.blueprint.BlueprintScreen;
 import com.simibubi.create.content.equipment.toolbox.ToolboxBlock;
 import com.simibubi.create.content.fluids.VirtualFluid;
@@ -53,16 +55,20 @@ import com.simibubi.create.content.kinetics.millstone.MillingRecipe;
 import com.simibubi.create.content.kinetics.mixer.MixingRecipe;
 import com.simibubi.create.content.kinetics.press.MechanicalPressBlockEntity;
 import com.simibubi.create.content.kinetics.saw.SawBlockEntity;
+import com.simibubi.create.content.legacy.ChromaticCompoundItem;
+import com.simibubi.create.content.legacy.NoGravMagicalDohickyItem;
 import com.simibubi.create.content.logistics.filter.AttributeFilterScreen;
 import com.simibubi.create.content.logistics.filter.FilterScreen;
 import com.simibubi.create.content.processing.basin.BasinRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
 import com.simibubi.create.content.redstone.link.controller.LinkedControllerScreen;
+import com.simibubi.create.content.trains.schedule.ScheduleItem;
 import com.simibubi.create.content.trains.schedule.ScheduleScreen;
 import com.simibubi.create.foundation.fluid.FluidIngredient;
 import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
 import com.simibubi.create.foundation.item.ItemHelper;
 import com.simibubi.create.foundation.item.TagDependentIngredientItem;
+import com.tterrag.registrate.util.entry.FluidEntry;
 
 import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiPlugin;
@@ -70,22 +76,21 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.recipe.EmiWorldInteractionRecipe;
 import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
+import io.github.fabricators_of_create.porting_lib.transfer.MutableContainerItemContext;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -105,7 +110,9 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.item.crafting.SmokingRecipe;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
 public class CreateEmiPlugin implements EmiPlugin {
@@ -142,7 +149,10 @@ public class CreateEmiPlugin implements EmiPlugin {
 	public void register(EmiRegistry registry) {
 		registry.removeEmiStacks(s -> {
 			Object key = s.getKey();
+			Item item = s.getItemStack().getItem();
 			if (key instanceof TagDependentIngredientItem tagDependent && tagDependent.shouldHide())
+				return true;
+			if (HiddenItems.getHiddenPredicate().test(item))
 				return true;
 			return key instanceof VirtualFluid;
 		});
@@ -240,7 +250,7 @@ public class CreateEmiPlugin implements EmiPlugin {
 		addAll(registry, AllRecipeTypes.MIXING, MIXING, MixingEmiRecipe::new);
 		for (CraftingRecipe recipe : manager.getAllRecipesFor(RecipeType.CRAFTING)) {
 			if (recipe instanceof ShapelessRecipe && !MechanicalPressBlockEntity.canCompress(recipe)
-					&& !AllRecipeTypes.shouldIgnoreInAutomation(recipe)) {
+					&& !AllRecipeTypes.shouldIgnoreInAutomation(recipe) && recipe.getIngredients().size() > 1) {
 				registry.addRecipe(new ShapelessEmiRecipe(AUTOMATIC_SHAPELESS, BasinRecipe.convertShapeless(recipe)));
 			}
 		}
@@ -278,6 +288,10 @@ public class CreateEmiPlugin implements EmiPlugin {
 		addAll(registry, AllRecipeTypes.ITEM_APPLICATION, ManualItemApplicationEmiRecipe::new);
 		addAll(registry, AllRecipeTypes.MECHANICAL_CRAFTING, MECHANICAL_CRAFTING, MechanicalCraftingEmiRecipe::new);
 
+		// In World Interaction recipes
+		addLavaCollision(registry, AllFluids.HONEY, AllPaletteStoneTypes.LIMESTONE);
+		addLavaCollision(registry, AllFluids.CHOCOLATE, AllPaletteStoneTypes.SCORIA);
+
 		// Introspective recipes based on present stacks need to make sure
 		// all stacks are populated by other plugins
 		registry.addDeferredRecipes(this::addDeferredRecipes);
@@ -298,15 +312,45 @@ public class CreateEmiPlugin implements EmiPlugin {
 		}
 	}
 
+	/**
+	 * Register an In World Interaction recipe for a fluid colliding with lava.
+	 */
+	private void addLavaCollision(EmiRegistry registry, FluidEntry<?> fluid, AllPaletteStoneTypes outputType) {
+		EmiStack lava = EmiStack.of(Fluids.LAVA, FluidConstants.BUCKET);
+		lava = lava.setRemainder(lava);
+
+		EmiStack fluidStack = EmiStack.of(fluid.get().getSource(), FluidConstants.BUCKET);
+		fluidStack = fluidStack.setRemainder(fluidStack);
+
+		Block block = outputType.getBaseBlock().get();
+		EmiStack output = EmiStack.of(block);
+		String blockName = BuiltInRegistries.BLOCK.getKey(block).getPath();
+
+		registry.addRecipe(
+				EmiWorldInteractionRecipe.builder()
+						.id(synthetic("emi/fluid_interaction/" + blockName))
+						.leftInput(fluidStack)
+						.rightInput(lava, false)
+						.output(output)
+						.build()
+		);
+	}
+
+	private static ResourceLocation synthetic(String path) {
+		if (path.startsWith("/"))
+			throw new IllegalArgumentException("Starting slash is added automatically");
+		// EMI recommends starting synthetic IDs with a slash so that they can't possibly conflict with data packs.
+		return Create.asResource('/' + path);
+	}
+
 	private void addDeferredRecipes(Consumer<EmiRecipe> consumer) {
-		List<FluidVariant> fluids = EmiApi.getIndexStacks().stream()
-			.filter(s -> s.getKey() instanceof FluidVariant)
-			.map(s -> (FluidVariant) s.getKey())
+		List<Fluid> fluids = EmiApi.getIndexStacks().stream()
+			.filter(s -> s.getKey() instanceof Fluid)
+			.map(s -> (Fluid) s.getKey())
 			.distinct()
 			.toList();
 		for (EmiStack stack : EmiApi.getIndexStacks()) {
-			if (stack.getKey() instanceof ItemVariant iv) {
-				Item i = iv.getItem();
+			if (stack.getKey() instanceof Item i) {
 				ItemStack is = stack.getItemStack();
 				if (i instanceof PotionItem) {
 					FluidStack potion = PotionFluidHandler.getFluidFromPotionItem(is);
@@ -329,14 +373,14 @@ public class CreateEmiPlugin implements EmiPlugin {
 								.build()));
 					continue;
 				}
-				for (FluidVariant fluid : fluids) {
-					if (i == Items.GLASS_BOTTLE && fluid.getFluid() == Fluids.WATER) {
+				for (Fluid fluid : fluids) {
+					if (i == Items.GLASS_BOTTLE && fluid == Fluids.WATER) {
 						continue;
 					}
 					// This will miss fluid containers that hold a minimum of over 1000 L, but perhaps that's preferable.
 					FluidStack fs = new FluidStack(fluid, FluidConstants.BUCKET);
 					ItemStack copy = is.copy();
-					ContainerItemContext ctx = ContainerItemContext.withInitial(copy);
+					MutableContainerItemContext ctx = new MutableContainerItemContext(copy);
 					Storage<FluidVariant> storage = ctx.find(FluidStorage.ITEM);
 					if (storage != null && GenericItemFilling.isFluidHandlerValid(copy, storage)) {
 						long inserted = 0;
@@ -361,7 +405,7 @@ public class CreateEmiPlugin implements EmiPlugin {
 					}
 				}
 				ItemStack copy = is.copy();
-				ContainerItemContext ctx = ContainerItemContext.withInitial(copy);
+				MutableContainerItemContext ctx = new MutableContainerItemContext(copy);
 				Storage<FluidVariant> storage = ctx.find(FluidStorage.ITEM);
 				if (storage != null) {
 					FluidStack extracted = TransferUtil.extractAnyFluid(storage, FluidConstants.BUCKET);

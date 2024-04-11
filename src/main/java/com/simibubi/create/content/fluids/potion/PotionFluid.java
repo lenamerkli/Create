@@ -7,7 +7,7 @@ import com.simibubi.create.AllFluids;
 import com.simibubi.create.content.fluids.VirtualFluid;
 import com.simibubi.create.foundation.utility.RegisteredObjects;
 
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
@@ -57,36 +57,36 @@ public class PotionFluid extends VirtualFluid {
 	public enum BottleType {
 		REGULAR, SPLASH, LINGERING;
 	}
+/*
+	// fabric: PotionFluidVariantRenderHandler and PotionFluidVariantAttributeHandler in AllFluids
+	public static class PotionFluidAttributes extends FluidAttributes {
 
-// fabric: PotionFluidVariantRenderHandler and PotionFluidVariantAttributeHandler in AllFluids
-// --------------------------------
-//	public static class PotionFluidType extends TintedFluidType {
-//
-//		public PotionFluidType(Properties properties, ResourceLocation stillTexture, ResourceLocation flowingTexture) {
-//			super(properties, stillTexture, flowingTexture);
-//		}
-//
-//		@Override
-//		public int getTintColor(FluidStack stack) {
-//			CompoundTag tag = stack.getOrCreateTag();
-//			int color = PotionUtils.getColor(PotionUtils.getAllEffects(tag)) | 0xff000000;
-//			return color;
-//		}
-//
-//		@Override
-//		public String getDescriptionId(FluidStack stack) {
-//			CompoundTag tag = stack.getOrCreateTag();
-//			ItemLike itemFromBottleType =
-//				PotionFluidHandler.itemFromBottleType(NBTHelper.readEnum(tag, "Bottle", BottleType.class));
-//			return PotionUtils.getPotion(tag)
-//				.getName(itemFromBottleType.asItem()
-//					.getDescriptionId() + ".effect.");
-//		}
-//
-//		@Override
-//		protected int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-//			return NO_TINT;
-//		}
-//
-//	}
+		public PotionFluidAttributes(Builder builder, Fluid fluid) {
+			super(builder, fluid);
+		}
+
+		@Override
+		public int getColor(FluidStack stack) {
+			CompoundTag tag = stack.getOrCreateTag();
+			int color = PotionUtils.getColor(PotionUtils.getAllEffects(tag)) | 0xff000000;
+			return color;
+		}
+
+		@Override
+		public Component getDisplayName(FluidStack stack) {
+			return Components.translatable(getTranslationKey(stack));
+		}
+
+		@Override
+		public String getTranslationKey(FluidStack stack) {
+			CompoundTag tag = stack.getOrCreateTag();
+			ItemLike itemFromBottleType =
+					PotionFluidHandler.itemFromBottleType(NBTHelper.readEnum(tag, "Bottle", BottleType.class));
+			return PotionUtils.getPotion(tag)
+					.getName(itemFromBottleType.asItem()
+							.getDescriptionId() + ".effect.");
+		}
+
+	}*/
+
 }

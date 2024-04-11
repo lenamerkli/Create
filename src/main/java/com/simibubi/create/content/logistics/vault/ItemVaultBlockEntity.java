@@ -5,15 +5,18 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.simibubi.create.AllBlockEntityTypes;
+import com.simibubi.create.Create;
 import com.simibubi.create.api.connectivity.ConnectivityHandler;
 import com.simibubi.create.foundation.blockEntity.IMultiBlockEntityContainer;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.inventory.VersionedInventoryWrapper;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 import io.github.fabricators_of_create.porting_lib.transfer.item.ItemStackHandler;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedSlottedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +30,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBlockEntityContainer.Inventory, SidedStorageBlockEntity {
-
 	protected Storage<ItemVariant> itemCapability;
 
 	protected ItemStackHandler inventory;
@@ -265,7 +267,8 @@ public class ItemVaultBlockEntity extends SmartBlockEntity implements IMultiBloc
 			}
 		}
 
-		CombinedSlottedStorage<ItemVariant, ItemStackHandler> combinedInvWrapper = new CombinedSlottedStorage<>(List.of(invs));
+		Storage<ItemVariant> combinedInvWrapper = new CombinedStorage<>(List.of(invs));
+		combinedInvWrapper = new VersionedInventoryWrapper(combinedInvWrapper);
 		itemCapability = combinedInvWrapper;
 	}
 

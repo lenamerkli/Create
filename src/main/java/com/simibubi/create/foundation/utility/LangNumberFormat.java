@@ -17,8 +17,8 @@ public class LangNumberFormat {
 
 	public void update() {
 		format = NumberFormat.getInstance(Minecraft.getInstance()
-			.getLanguageManager()
-			.getSelectedJavaLocale());
+				.getLanguageManager()
+				.getSelectedJavaLocale());
 		format.setMaximumFractionDigits(2);
 		format.setMinimumFractionDigits(0);
 		format.setGroupingUsed(true);

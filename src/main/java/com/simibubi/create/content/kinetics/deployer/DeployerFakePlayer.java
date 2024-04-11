@@ -7,8 +7,11 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import io.github.fabricators_of_create.porting_lib.entity.events.EntityEvents.EntitySizeEvent;
+import io.github.fabricators_of_create.porting_lib.entity.events.EntityEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
 import io.github.fabricators_of_create.porting_lib.util.UsernameCache;
+
+import net.fabricmc.fabric.api.entity.FakePlayer;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -17,7 +20,6 @@ import com.simibubi.create.foundation.utility.Lang;
 import com.simibubi.create.infrastructure.config.AllConfigs;
 import com.simibubi.create.infrastructure.config.CKinetics;
 
-import io.github.fabricators_of_create.porting_lib.fake_players.FakePlayer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -105,9 +107,9 @@ public class DeployerFakePlayer extends FakePlayer {
 		return owner == null ? super.getUUID() : owner;
 	}
 
-	public static void deployerHasEyesOnHisFeet(EntitySizeEvent event) {
-		if (event.entity instanceof DeployerFakePlayer)
-			event.eyeHeight = 0;
+	public static void deployerHasEyesOnHisFeet(EntityEvents.Size event) {
+		if (event.getEntity() instanceof DeployerFakePlayer)
+			event.setNewEyeHeight(0);
 	}
 
 	public static boolean deployerCollectsDropsFromKilledEntities(LivingEntity target, DamageSource source, Collection<ItemEntity> drops, int lootingLevel, boolean recentlyHit) {
@@ -140,22 +142,22 @@ public class DeployerFakePlayer extends FakePlayer {
 		return i;
 	}
 
-	public static void entitiesDontRetaliate(LivingEntity entityLiving, LivingEntity target) {
-		if (!(target instanceof DeployerFakePlayer))
+	public static void entitiesDontRetaliate(LivingEntityEvents.ChangeTarget.ChangeTargetEvent event) {
+		if (!(event.getOriginalTarget() instanceof DeployerFakePlayer))
 			return;
-		if (!(entityLiving instanceof Mob))
+		LivingEntity entityLiving = (LivingEntity) event.getEntity();
+		if (!(entityLiving instanceof Mob mob))
 			return;
-		Mob mob = (Mob) entityLiving;
 
 		CKinetics.DeployerAggroSetting setting = AllConfigs.server().kinetics.ignoreDeployerAttacks.get();
 
 		switch (setting) {
 		case ALL:
-			mob.setTarget(null);
+			event.setCanceled(true);
 			break;
 		case CREEPERS:
 			if (mob instanceof Creeper)
-				mob.setTarget(null);
+				event.setCanceled(true);
 			break;
 		case NONE:
 		default:

@@ -14,8 +14,9 @@ import com.simibubi.create.foundation.utility.RegisteredObjects;
 
 import com.simibubi.create.foundation.item.ItemHelper;
 
+import io.github.fabricators_of_create.porting_lib.transfer.MutableContainerItemContext;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import io.github.fabricators_of_create.porting_lib.util.FluidStack;
+import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.fabric.constants.FabricTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -58,13 +59,13 @@ public class ItemDrainCategory extends CreateRecipeCategory<EmptyingRecipe> {
 				continue;
 			}
 
-			ContainerItemContext testCtx = ContainerItemContext.withInitial(stack);
+			ContainerItemContext testCtx = ContainerItemContext.withConstant(stack);
 			Storage<FluidVariant> testStorage = testCtx.find(FluidStorage.ITEM);
 			if (testStorage == null)
 				continue;
 
 			ItemStack copy = stack.copy();
-			ContainerItemContext ctx = ContainerItemContext.withInitial(copy);
+			MutableContainerItemContext ctx = new MutableContainerItemContext(copy);
 			Storage<FluidVariant> storage = ctx.find(FluidStorage.ITEM);
 			FluidStack extracted = TransferUtil.extractAnyFluid(storage, FluidConstants.BUCKET);
 			ItemVariant result = ctx.getItemVariant();

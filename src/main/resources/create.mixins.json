@@ -1,5 +1,6 @@
 {
   "required": true,
+  "minVersion": "0.8",
   "priority": 1100,
   "package": "com.simibubi.create.foundation.mixin",
   "compatibilityLevel": "JAVA_17",
@@ -14,14 +15,18 @@
     "WaterWheelFluidSpreadMixin",
     "accessor.AbstractProjectileDispenseBehaviorAccessor",
     "accessor.DispenserBlockAccessor",
+    "accessor.EntityAccessor",
     "accessor.FallingBlockEntityAccessor",
     "accessor.GameTestHelperAccessor",
     "accessor.LivingEntityAccessor",
     "accessor.NbtAccounterAccessor",
     "accessor.ServerLevelAccessor",
+    "accessor.SystemReportAccessor",
     "fabric.AbstractMinecartMixin",
+    "fabric.BlockableEventLoopAccessor",
     "fabric.EntityAccessor",
     "fabric.EntityMixin",
+    "fabric.RegistryMixin",
     "fabric.ServerGamePacketListenerImplAccessor",
     "fabric.SortedArraySetAccessor",
     "fabric.StructureUtilsMixin",
@@ -35,7 +40,6 @@
     "client.BlockDestructionProgressMixin",
     "client.CameraMixin",
     "client.EntityContraptionInteractionMixin",
-    "client.FixNormalScalingMixin",
     "client.GameRendererMixin",
     "client.HeavyBootsOnPlayerMixin",
     "client.HumanoidArmorLayerMixin",
@@ -48,6 +52,5 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "minVersion": "0.8"
+  }
 }
