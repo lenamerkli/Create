@@ -2,14 +2,14 @@
   "type": "create:crushing",
   "ingredients": [
     {
-      "item": "minecraft:ochrum"
+      "item": "create:veridium"
     }
   ],
   "processingTime": 250,
   "results": [
     {
       "chance": 0.25,
-      "item": "minecraft:glowstone_dust"
+      "item": "minecraft:redstone"
     },
     {
       "chance": 0.5,
@@ -17,7 +17,7 @@
     },
     {
       "chance": 0.5,
-      "item": "create:granite"
+      "item": "create:limestone"
     }
   ]
 }

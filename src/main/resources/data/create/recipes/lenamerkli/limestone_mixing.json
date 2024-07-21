@@ -8,14 +8,15 @@
       "item": "minecraft:quartz"
     },
     {
+      "amount": 8000,
       "fluid": "minecraft:lava",
-      "nbt": {},
-      "amount": 8000
+      "nbt": {}
     }
   ],
   "results": [
     {
-      "item": "minecraft:tuff"
+      "count": 1,
+      "item": "create:limestone"
     }
   ]
 }
